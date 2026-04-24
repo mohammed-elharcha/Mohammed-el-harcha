@@ -1,0 +1,1916 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>Mohammed El Harcha — Full Stack Developer</title>
+<script src="https://cdn.tailwindcss.com"></script>
+<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Bricolage+Grotesque:opsz,wght@12..96,300;12..96,400;12..96,500;12..96,700;12..96,800&display=swap" rel="stylesheet"/>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css"/>
+<!-- EmailJS SDK for contact form -->
+<script src="https://cdn.jsdelivr.net/npm/@emailjs/browser@3/dist/email.min.js"></script>
+
+<style>
+/* ═══════════════════════════════════════════
+   CSS CUSTOM PROPERTIES — DARK & LIGHT THEMES
+═══════════════════════════════════════════ */
+:root {
+  --bg: #060609;
+  --surface: #0d0d14;
+  --card: #111118;
+  --border: #1c1c2a;
+  --text: #f0f0f5;
+  --muted: #5a5a72;
+  --muted2: #9090aa;
+  --em: #e8ff47;
+  --em2: #ff4f6e;
+  --em3: #4fffff;
+  --shadow: rgba(232,255,71,0.08);
+  --transition-theme: background 0.4s ease, color 0.4s ease, border-color 0.4s ease;
+}
+
+[data-theme="light"] {
+  --bg: #f5f5f0;
+  --surface: #ffffff;
+  --card: #fafafa;
+  --border: #e0e0d8;
+  --text: #0a0a10;
+  --muted: #9090a0;
+  --muted2: #5a5a68;
+  --em: #6b7a00;
+  --em2: #cc1133;
+  --em3: #006666;
+  --shadow: rgba(0,0,0,0.08);
+}
+
+/* ═══════════════════════════════════════════
+   GLOBAL RESET & BASE
+═══════════════════════════════════════════ */
+*, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+html { scroll-behavior: smooth; overflow-x: hidden; }
+
+body {
+  font-family: 'Bricolage Grotesque', sans-serif;
+  background: var(--bg);
+  color: var(--text);
+  transition: var(--transition-theme);
+  overflow-x: hidden;
+  min-height: 100vh;
+}
+
+/* Noise texture overlay for depth */
+body::before {
+  content: '';
+  position: fixed; inset: 0;
+  pointer-events: none; z-index: 9997;
+  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.04'/%3E%3C/svg%3E");
+  opacity: 0.35;
+}
+
+/* Scrollbar */
+::-webkit-scrollbar { width: 4px; }
+::-webkit-scrollbar-track { background: var(--bg); }
+::-webkit-scrollbar-thumb { background: var(--border); border-radius: 2px; }
+::-webkit-scrollbar-thumb:hover { background: var(--em); }
+
+/* Selection */
+::selection { background: var(--em); color: #060609; }
+
+/* ═══════════════════════════════════════════
+   NAVBAR
+═══════════════════════════════════════════ */
+nav {
+  position: fixed; top: 0; left: 0; right: 0; z-index: 200;
+  padding: 0 clamp(1.5rem, 5vw, 4rem);
+  height: 64px;
+  display: flex; align-items: center; justify-content: space-between;
+  transition: background 0.3s ease, border-color 0.3s ease, backdrop-filter 0.3s ease;
+}
+nav.scrolled {
+  background: rgba(6, 6, 9, 0.92);
+  backdrop-filter: blur(24px) saturate(160%);
+  border-bottom: 1px solid var(--border);
+}
+[data-theme="light"] nav.scrolled {
+  background: rgba(245, 245, 240, 0.92);
+}
+
+.nav-logo {
+  font-family: 'Bebas Neue', sans-serif;
+  font-size: 1.6rem; letter-spacing: .05em;
+  color: var(--text); text-decoration: none;
+  transition: color 0.2s;
+}
+.nav-logo span { color: var(--em); }
+
+.nav-links { display: flex; gap: 2rem; list-style: none; }
+.nav-links a {
+  font-size: 12px; font-weight: 600; letter-spacing: .08em; text-transform: uppercase;
+  color: var(--muted2); text-decoration: none;
+  transition: color 0.2s;
+  position: relative; padding-bottom: 2px;
+}
+.nav-links a::after {
+  content: ''; position: absolute; bottom: -4px; left: 0;
+  width: 0; height: 1px; background: var(--em);
+  transition: width 0.3s cubic-bezier(.4, 0, .2, 1);
+}
+.nav-links a:hover, .nav-links a.active { color: var(--text); }
+.nav-links a:hover::after, .nav-links a.active::after { width: 100%; }
+
+.nav-right { display: flex; align-items: center; gap: 10px; }
+
+/* ═══ THEME TOGGLE BUTTON — Modern pill with sun/moon ═══ */
+.theme-toggle {
+  position: relative;
+  width: 52px; height: 28px;
+  background: var(--border);
+  border: 1px solid var(--border);
+  border-radius: 14px;
+  cursor: pointer;
+  transition: background 0.35s ease, border-color 0.35s ease;
+  outline: none;
+  flex-shrink: 0;
+}
+.theme-toggle:hover { border-color: var(--em); }
+.theme-toggle-thumb {
+  position: absolute;
+  top: 3px; left: 3px;
+  width: 20px; height: 20px;
+  border-radius: 50%;
+  background: var(--text);
+  display: flex; align-items: center; justify-content: center;
+  font-size: 10px;
+  transition: transform 0.35s cubic-bezier(.34, 1.56, .64, 1), background 0.3s;
+  color: var(--bg);
+  box-shadow: 0 1px 4px rgba(0,0,0,0.3);
+}
+[data-theme="light"] .theme-toggle-thumb {
+  transform: translateX(24px);
+  background: var(--em);
+  color: #060609;
+}
+
+/* ═══ LANGUAGE SWITCHER ═══ */
+.lang-switcher {
+  position: relative;
+}
+.lang-btn {
+  display: flex; align-items: center; gap: 5px;
+  border: 1px solid var(--border); border-radius: 4px;
+  padding: 5px 10px; cursor: pointer; background: transparent;
+  font-size: 11px; font-weight: 700; letter-spacing: .08em; text-transform: uppercase;
+  color: var(--muted2); transition: all 0.2s;
+  font-family: 'Bricolage Grotesque', sans-serif;
+}
+.lang-btn:hover { border-color: var(--em); color: var(--em); }
+.lang-btn i { font-size: 10px; transition: transform 0.2s; }
+.lang-btn.open i { transform: rotate(180deg); }
+.lang-dropdown {
+  position: absolute; top: calc(100% + 6px); right: 0;
+  background: var(--surface); border: 1px solid var(--border);
+  border-radius: 4px; overflow: hidden;
+  min-width: 90px;
+  opacity: 0; transform: translateY(-8px) scale(0.97);
+  pointer-events: none;
+  transition: opacity 0.2s, transform 0.2s;
+  z-index: 300;
+  box-shadow: 0 8px 24px rgba(0,0,0,0.3);
+}
+.lang-dropdown.open { opacity: 1; transform: translateY(0) scale(1); pointer-events: all; }
+.lang-option {
+  display: flex; align-items: center; gap: 8px;
+  padding: 9px 14px; cursor: pointer;
+  font-size: 12px; font-weight: 600; letter-spacing: .06em;
+  color: var(--muted2); transition: all 0.15s;
+  border-bottom: 1px solid var(--border);
+}
+.lang-option:last-child { border-bottom: none; }
+.lang-option:hover { background: var(--card); color: var(--em); }
+.lang-option.active { color: var(--em); }
+.lang-option .flag { font-size: 14px; }
+
+/* HAMBURGER */
+.hamburger {
+  display: none; flex-direction: column; gap: 5px;
+  cursor: pointer; padding: 4px; background: transparent; border: none;
+}
+.hamburger span {
+  width: 22px; height: 2px; background: var(--text);
+  border-radius: 1px; transition: all 0.3s; display: block;
+}
+.hamburger.open span:nth-child(1) { transform: rotate(45deg) translate(5px, 5px); }
+.hamburger.open span:nth-child(2) { opacity: 0; }
+.hamburger.open span:nth-child(3) { transform: rotate(-45deg) translate(5px, -5px); }
+
+@media (max-width: 768px) {
+  .nav-links { display: none; }
+  .hamburger { display: flex; }
+}
+
+/* Mobile menu */
+#mob-menu {
+  display: none; position: fixed;
+  top: 64px; left: 0; right: 0; z-index: 199;
+  background: var(--surface); border-bottom: 1px solid var(--border);
+  padding: 1.5rem clamp(1.5rem, 5vw, 4rem);
+  flex-direction: column; gap: 1rem;
+  box-shadow: 0 12px 40px rgba(0,0,0,0.4);
+}
+#mob-menu a {
+  font-size: 14px; font-weight: 600; letter-spacing: .06em; text-transform: uppercase;
+  color: var(--muted2); text-decoration: none; transition: color 0.2s;
+  padding: 6px 0; border-bottom: 1px solid var(--border);
+}
+#mob-menu a:last-child { border-bottom: none; }
+#mob-menu a:hover { color: var(--em); }
+
+/* ═══════════════════════════════════════════
+   SHARED LAYOUT
+═══════════════════════════════════════════ */
+.wrap { max-width: 1200px; margin: 0 auto; padding: 0 clamp(1.5rem, 5vw, 4rem); }
+
+/* ═══ SECTION HEADER ═══ */
+.sec-header { display: flex; align-items: baseline; gap: 1.5rem; margin-bottom: 4rem; flex-wrap: wrap; }
+.sec-num {
+  font-family: 'Bebas Neue', sans-serif; font-size: 1rem;
+  color: var(--em); letter-spacing: .1em;
+}
+.sec-title {
+  font-family: 'Bebas Neue', sans-serif;
+  font-size: clamp(2.8rem, 6vw, 5.5rem); line-height: .95;
+  color: var(--text); letter-spacing: .02em;
+}
+.sec-title span { color: var(--em2); }
+.sec-line { flex: 1; height: 1px; background: var(--border); min-width: 20px; }
+
+/* ═══ BUTTONS ═══ */
+.btn-a {
+  background: var(--em); color: #060609;
+  font-size: 12px; font-weight: 800; letter-spacing: .1em; text-transform: uppercase;
+  padding: 13px 28px; border-radius: 2px;
+  display: inline-flex; align-items: center; gap: 8px;
+  border: none; cursor: pointer;
+  transition: all 0.25s cubic-bezier(.4, 0, .2, 1);
+  text-decoration: none;
+  font-family: 'Bricolage Grotesque', sans-serif;
+  position: relative; overflow: hidden;
+}
+.btn-a::before {
+  content: ''; position: absolute; inset: 0;
+  background: rgba(255,255,255,0.15);
+  transform: translateX(-100%); transition: transform 0.3s;
+}
+.btn-a:hover::before { transform: translateX(0); }
+.btn-a:hover { transform: translate(-2px, -2px); box-shadow: 4px 4px 0 var(--em2); }
+
+.btn-b {
+  border: 1px solid var(--border); color: var(--muted2);
+  font-size: 12px; font-weight: 700; letter-spacing: .1em; text-transform: uppercase;
+  padding: 12px 28px; border-radius: 2px;
+  display: inline-flex; align-items: center; gap: 8px;
+  cursor: pointer; transition: all 0.25s cubic-bezier(.4, 0, .2, 1);
+  text-decoration: none; background: transparent;
+  font-family: 'Bricolage Grotesque', sans-serif;
+}
+.btn-b:hover {
+  border-color: var(--text); color: var(--text);
+  transform: translate(-2px, -2px); box-shadow: 4px 4px 0 var(--border);
+}
+
+/* ═══════════════════════════════════════════
+   HERO SECTION
+═══════════════════════════════════════════ */
+#home {
+  min-height: 100vh; display: flex; flex-direction: column; justify-content: center;
+  padding-top: 64px; position: relative; overflow: hidden;
+}
+
+/* Animated gradient orb background */
+.hero-orb {
+  position: absolute;
+  border-radius: 50%;
+  pointer-events: none;
+  filter: blur(80px);
+  opacity: 0.06;
+  animation: orbFloat 8s ease-in-out infinite;
+}
+.hero-orb-1 { width: 600px; height: 600px; background: var(--em); top: -100px; right: -150px; animation-delay: 0s; }
+.hero-orb-2 { width: 400px; height: 400px; background: var(--em3); bottom: 50px; left: -100px; animation-delay: -4s; }
+@keyframes orbFloat { 0%,100%{transform:translateY(0) scale(1);} 50%{transform:translateY(-30px) scale(1.05);} }
+
+.hero-bg-num {
+  position: absolute; right: -2vw; top: 50%; transform: translateY(-50%);
+  font-family: 'Bebas Neue', sans-serif; font-size: clamp(14rem, 28vw, 32rem);
+  line-height: 1; color: transparent;
+  -webkit-text-stroke: 1px var(--border);
+  user-select: none; pointer-events: none; white-space: nowrap;
+  transition: -webkit-text-stroke-color 0.3s;
+}
+
+.hero-badge {
+  border: 1px solid var(--em); color: var(--em); font-size: 11px;
+  font-weight: 700; letter-spacing: .14em; text-transform: uppercase;
+  padding: 5px 14px; border-radius: 2px;
+  animation: badgePulse 3s ease-in-out infinite;
+  display: inline-flex; align-items: center; gap: 6px;
+}
+.hero-badge-dot { width: 7px; height: 7px; border-radius: 50%; background: var(--em); animation: dotBlink 1.4s ease-in-out infinite; }
+@keyframes dotBlink { 0%,100%{opacity:1; transform:scale(1);} 50%{opacity:.4; transform:scale(.8);} }
+@keyframes badgePulse { 0%,100%{box-shadow:0 0 0 0 rgba(232,255,71,0);} 50%{box-shadow:0 0 0 6px rgba(232,255,71,0.04);} }
+
+.hero-name {
+  font-family: 'Bebas Neue', sans-serif;
+  font-size: clamp(4.5rem, 11vw, 13rem);
+  line-height: .92; letter-spacing: .01em; color: var(--text);
+}
+.hero-name .hl { color: var(--em); }
+
+.hero-type {
+  font-family: 'Bebas Neue', sans-serif;
+  font-size: clamp(1.4rem, 3vw, 2.2rem);
+  color: var(--em3); letter-spacing: .05em;
+  margin-top: 1.5rem; align-items: center; gap: 8px;
+}
+.cursor2 {
+  display: inline-block; width: 3px; height: .85em;
+  background: var(--em3); animation: blink2 0.7s step-end infinite;
+}
+@keyframes blink2 { 0%,100%{opacity:1;} 50%{opacity:0;} }
+
+.hero-desc { max-width: 480px; margin-top: 2rem; }
+.hero-desc p { font-size: 15px; line-height: 1.85; color: var(--muted2); font-weight: 300; }
+.hero-desc p strong { color: var(--text); font-weight: 600; }
+.hero-btns { display: flex; gap: 1rem; flex-wrap: wrap; margin-top: 1.5rem; }
+
+/* Stats row */
+.stats-row {
+  display: flex; gap: 0;
+  border: 1px solid var(--border); border-radius: 2px; overflow: hidden;
+  margin-top: 4rem;
+}
+.stat-box {
+  flex: 1; padding: 1.5rem;
+  border-right: 1px solid var(--border);
+  transition: background 0.2s ease;
+  cursor: default;
+}
+.stat-box:last-child { border-right: none; }
+.stat-box:hover { background: var(--card); }
+.stat-num {
+  font-family: 'Bebas Neue', sans-serif; font-size: 3rem; line-height: 1;
+  color: var(--em);
+}
+.stat-label { font-size: 11px; text-transform: uppercase; letter-spacing: .1em; color: var(--muted); margin-top: 4px; }
+
+/* ═══════════════════════════════════════════
+   ABOUT
+═══════════════════════════════════════════ */
+#about { padding: 7rem 0; }
+.about-grid {
+  display: grid; grid-template-columns: 1fr 1fr;
+  gap: 4rem; align-items: start;
+}
+@media (max-width: 768px) { .about-grid { grid-template-columns: 1fr; gap: 2.5rem; } }
+
+.about-text p { font-size: 15px; line-height: 2; color: var(--muted2); margin-bottom: 1rem; }
+.about-text p strong { color: var(--text); font-weight: 600; }
+.about-text p em { color: var(--em); font-style: normal; font-weight: 700; }
+
+.about-details {
+  display: flex; flex-direction: column;
+  border: 1px solid var(--border); border-radius: 2px; overflow: hidden;
+}
+.detail-row {
+  display: flex; align-items: center; gap: 1rem;
+  padding: 1rem 1.25rem; border-bottom: 1px solid var(--border);
+  transition: background 0.2s;
+}
+.detail-row:last-child { border-bottom: none; }
+.detail-row:hover { background: var(--card); }
+.detail-key {
+  font-size: 10px; text-transform: uppercase; letter-spacing: .1em;
+  color: var(--muted); width: 90px; flex-shrink: 0;
+}
+.detail-val { font-size: 14px; font-weight: 600; color: var(--text); }
+.detail-val.green { color: #4ade80; }
+
+.about-tags { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 2rem; }
+.tag {
+  font-size: 11px; font-weight: 700; letter-spacing: .08em; text-transform: uppercase;
+  border: 1px solid var(--border); color: var(--muted2);
+  padding: 5px 12px; border-radius: 2px;
+  transition: all 0.2s ease;
+  cursor: default;
+}
+.tag:hover { border-color: var(--em); color: var(--em); background: rgba(232,255,71,.05); }
+
+/* ═══════════════════════════════════════════
+   SKILLS
+═══════════════════════════════════════════ */
+#skills { padding: 7rem 0; }
+.skills-grid {
+  display: grid; grid-template-columns: repeat(3, 1fr);
+  gap: 1px; background: var(--border);
+  border: 1px solid var(--border);
+}
+@media (max-width: 900px) { .skills-grid { grid-template-columns: 1fr 1fr; } }
+@media (max-width: 540px) { .skills-grid { grid-template-columns: 1fr; } }
+
+.skill-col { background: var(--bg); padding: 2.5rem 2rem; }
+.skill-col-title {
+  font-size: 11px; text-transform: uppercase; letter-spacing: .14em;
+  color: var(--em); font-weight: 700; margin-bottom: 2rem;
+  display: flex; align-items: center; gap: 8px;
+}
+.skill-col-title::before { content: ''; width: 16px; height: 1px; background: var(--em); }
+
+.skill-item { margin-bottom: 1.4rem; }
+.skill-row { display: flex; justify-content: space-between; align-items: baseline; margin-bottom: 6px; }
+.skill-name { font-size: 13px; font-weight: 600; color: var(--text); }
+.skill-pct { font-size: 11px; color: var(--muted); font-weight: 700; font-family: 'Bebas Neue', sans-serif; }
+.bar-bg { height: 3px; background: var(--border); overflow: hidden; }
+.bar-fg { height: 100%; background: var(--em); width: 0; transition: width 1.4s cubic-bezier(.4,0,.2,1); }
+.bar-fg.blue { background: var(--em3); }
+.bar-fg.red { background: var(--em2); }
+
+/* ═══════════════════════════════════════════
+   PROJECTS
+═══════════════════════════════════════════ */
+#projects { padding: 7rem 0; }
+.projects-grid {
+  display: grid; grid-template-columns: repeat(2, 1fr);
+  gap: 1px; background: var(--border); border: 1px solid var(--border);
+}
+@media (max-width: 700px) { .projects-grid { grid-template-columns: 1fr; } }
+
+.proj-card {
+  background: var(--bg); overflow: hidden;
+  transition: background 0.2s ease; position: relative;
+}
+.proj-card:hover { background: var(--card); }
+.proj-card.featured {
+  grid-column: 1 / -1;
+  display: grid; grid-template-columns: 1fr 1fr;
+}
+@media (max-width: 700px) { .proj-card.featured { grid-column: auto; display: block; } }
+
+.proj-visual {
+  aspect-ratio: 16/9;
+  display: flex; align-items: center; justify-content: center;
+  position: relative; overflow: hidden;
+  border-bottom: 1px solid var(--border);
+}
+.proj-card.featured .proj-visual {
+  aspect-ratio: auto; border-bottom: none;
+  border-right: 1px solid var(--border);
+}
+.proj-visual-label {
+  position: absolute; bottom: 12px; left: 12px;
+  font-size: 10px; text-transform: uppercase; letter-spacing: .12em; font-weight: 700;
+  background: var(--em); color: #060609; padding: 3px 8px; border-radius: 1px;
+}
+
+.proj-body { padding: 2rem; }
+.proj-tags { display: flex; gap: 6px; flex-wrap: wrap; margin-bottom: 1rem; }
+.proj-tag {
+  font-size: 10px; text-transform: uppercase; letter-spacing: .1em; font-weight: 700;
+  color: var(--muted); border: 1px solid var(--border); padding: 3px 8px; border-radius: 1px;
+}
+.proj-name {
+  font-family: 'Bebas Neue', sans-serif; font-size: 2rem;
+  letter-spacing: .03em; color: var(--text); margin-bottom: .5rem; line-height: 1;
+}
+.proj-desc { font-size: 13px; color: var(--muted2); line-height: 1.8; margin-bottom: 1.5rem; }
+.proj-actions { display: flex; gap: 10px; }
+.proj-btn {
+  font-size: 11px; font-weight: 700; letter-spacing: .1em; text-transform: uppercase;
+  padding: 8px 16px; border-radius: 1px;
+  display: inline-flex; align-items: center; gap: 6px;
+  transition: all 0.2s ease; text-decoration: none; cursor: pointer;
+  font-family: 'Bricolage Grotesque', sans-serif;
+}
+.proj-btn-fill { background: var(--em); color: #060609; border: none; }
+.proj-btn-fill:hover { background: #fff; transform: translate(-1px,-1px); box-shadow: 2px 2px 0 var(--em2); }
+.proj-btn-out { border: 1px solid var(--border); color: var(--muted2); background: transparent; }
+.proj-btn-out:hover { border-color: var(--text); color: var(--text); }
+
+/* ═══════════════════════════════════════════
+   CERTIFICATES
+═══════════════════════════════════════════ */
+#certificates { padding: 7rem 0; }
+.certs-list {
+  display: flex; flex-direction: column;
+  gap: 1px; background: var(--border); border: 1px solid var(--border);
+}
+.cert-row {
+  display: grid; grid-template-columns: 60px 1fr auto;
+  align-items: center; gap: 2rem;
+  background: var(--bg); padding: 1.75rem 2rem;
+  transition: background 0.2s ease; cursor: pointer;
+}
+.cert-row:hover { background: var(--card); }
+.cert-idx {
+  font-family: 'Bebas Neue', sans-serif; font-size: 2rem;
+  color: var(--border); letter-spacing: .05em; text-align: center;
+  transition: color 0.2s;
+}
+.cert-row:hover .cert-idx { color: var(--em); }
+.cert-issuer { font-size: 11px; text-transform: uppercase; letter-spacing: .12em; color: var(--muted); margin-bottom: 4px; }
+.cert-name { font-size: 15px; font-weight: 700; color: var(--text); }
+.cert-meta { display: flex; flex-direction: column; align-items: flex-end; gap: 6px; }
+.cert-date { font-size: 12px; color: var(--muted); white-space: nowrap; }
+.cert-view-btn {
+  font-size: 11px; font-weight: 700; letter-spacing: .1em; text-transform: uppercase;
+  color: var(--em); text-decoration: none; display: flex; align-items: center; gap: 4px;
+  background: transparent; border: none; cursor: pointer;
+  font-family: 'Bricolage Grotesque', sans-serif;
+  opacity: 0; transition: opacity 0.2s;
+  padding: 0;
+}
+.cert-row:hover .cert-view-btn { opacity: 1; }
+@media (max-width: 600px) {
+  .cert-row { grid-template-columns: 40px 1fr; }
+  .cert-meta { display: none; }
+}
+
+/* ═══════════════════════════════════════════
+   CERTIFICATE MODAL
+═══════════════════════════════════════════ */
+.cert-modal-overlay {
+  position: fixed; inset: 0; z-index: 1000;
+  background: rgba(0,0,0,0.85);
+  backdrop-filter: blur(12px);
+  display: flex; align-items: center; justify-content: center;
+  padding: 1rem;
+  opacity: 0; pointer-events: none;
+  transition: opacity 0.3s ease;
+}
+.cert-modal-overlay.open { opacity: 1; pointer-events: all; }
+
+.cert-modal {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 4px;
+  width: 100%; max-width: 780px;
+  max-height: 90vh;
+  overflow: hidden;
+  transform: translateY(30px) scale(0.97);
+  transition: transform 0.35s cubic-bezier(.34, 1.2, .64, 1), opacity 0.3s;
+  opacity: 0;
+  display: flex; flex-direction: column;
+}
+.cert-modal-overlay.open .cert-modal { transform: translateY(0) scale(1); opacity: 1; }
+
+.cert-modal-header {
+  display: flex; align-items: center; justify-content: space-between;
+  padding: 1.25rem 1.5rem;
+  border-bottom: 1px solid var(--border);
+  flex-shrink: 0;
+}
+.cert-modal-title { font-size: 14px; font-weight: 700; color: var(--text); }
+.cert-modal-issuer { font-size: 11px; text-transform: uppercase; letter-spacing: .1em; color: var(--muted); margin-top: 2px; }
+
+.cert-modal-actions { display: flex; align-items: center; gap: 8px; }
+.cert-modal-download {
+  display: flex; align-items: center; gap: 6px;
+  font-size: 11px; font-weight: 700; letter-spacing: .08em; text-transform: uppercase;
+  background: var(--em); color: #060609;
+  border: none; border-radius: 2px; padding: 7px 14px;
+  cursor: pointer; transition: all 0.2s;
+  font-family: 'Bricolage Grotesque', sans-serif;
+  text-decoration: none;
+}
+.cert-modal-download:hover { background: #fff; }
+.cert-modal-close {
+  width: 32px; height: 32px; border-radius: 2px;
+  border: 1px solid var(--border); background: transparent; cursor: pointer;
+  display: flex; align-items: center; justify-content: center;
+  color: var(--muted2); transition: all 0.2s; font-size: 14px;
+}
+.cert-modal-close:hover { border-color: var(--em2); color: var(--em2); }
+
+.cert-modal-body {
+  flex: 1; overflow-y: auto;
+  display: flex; flex-direction: column; align-items: center; justify-content: center;
+  padding: 2rem; background: var(--card);
+  min-height: 350px;
+}
+.cert-placeholder {
+  width: 100%; max-width: 600px;
+  aspect-ratio: 1.414; /* A4 ratio */
+  border: 2px dashed var(--border);
+  border-radius: 2px;
+  display: flex; flex-direction: column; align-items: center; justify-content: center;
+  gap: 1rem; color: var(--muted); background: var(--bg);
+}
+.cert-placeholder i { font-size: 3rem; }
+.cert-placeholder p { font-size: 13px; text-align: center; line-height: 1.6; }
+
+/* ═══════════════════════════════════════════
+   CONTACT
+═══════════════════════════════════════════ */
+#contact { padding: 7rem 0; }
+.contact-grid {
+  display: grid; grid-template-columns: 1fr 1.4fr;
+  gap: 4rem; align-items: start;
+}
+@media (max-width: 800px) { .contact-grid { grid-template-columns: 1fr; gap: 3rem; } }
+
+.contact-tagline {
+  font-family: 'Bebas Neue', sans-serif;
+  font-size: clamp(2rem, 5vw, 3.5rem);
+  line-height: 1; color: var(--text); letter-spacing: .02em;
+}
+.contact-tagline span { color: var(--em); }
+.contact-tagline small {
+  font-family: 'Bricolage Grotesque', sans-serif;
+  font-size: 14px; color: var(--muted2); font-weight: 400;
+  display: block; margin-top: .5rem; letter-spacing: 0; line-height: 1.7;
+}
+
+.socials { display: flex; gap: 8px; flex-wrap: wrap; }
+.soc-btn {
+  width: 44px; height: 44px; border: 1px solid var(--border);
+  display: flex; align-items: center; justify-content: center;
+  color: var(--muted); transition: all 0.2s ease;
+  text-decoration: none; font-size: 15px; border-radius: 2px;
+}
+.soc-btn:hover {
+  border-color: var(--em); color: var(--em);
+  background: rgba(232,255,71,.06);
+  transform: translate(-2px, -2px); box-shadow: 2px 2px 0 var(--em);
+}
+
+/* Contact form */
+.contact-form {
+  display: flex; flex-direction: column;
+  border: 1px solid var(--border);
+}
+.form-row {
+  display: grid; grid-template-columns: 1fr 1fr;
+  gap: 1px; background: var(--border);
+}
+@media (max-width: 500px) { .form-row { grid-template-columns: 1fr; } }
+.form-field {
+  display: flex; flex-direction: column; background: var(--bg);
+  padding: 1.25rem 1.5rem;
+  border-bottom: 1px solid var(--border);
+  transition: background 0.2s;
+}
+.form-field:focus-within { background: var(--card); }
+.form-label {
+  font-size: 10px; text-transform: uppercase; letter-spacing: .14em;
+  color: var(--muted); font-weight: 700; margin-bottom: 6px;
+}
+.form-input, .form-textarea {
+  background: transparent; border: none; outline: none;
+  font-family: 'Bricolage Grotesque', sans-serif;
+  font-size: 14px; color: var(--text); font-weight: 400;
+}
+.form-input::placeholder, .form-textarea::placeholder { color: var(--muted); }
+.form-textarea { resize: none; min-height: 120px; }
+
+/* Form validation styles */
+.form-field.error .form-label { color: var(--em2); }
+.form-field.error .form-input,
+.form-field.error .form-textarea { color: var(--em2); }
+.form-error-msg {
+  font-size: 10px; color: var(--em2); margin-top: 4px;
+  letter-spacing: .04em; display: none;
+}
+.form-field.error .form-error-msg { display: block; }
+
+.form-submit-row { background: var(--bg); }
+.form-submit {
+  width: 100%; padding: 1.25rem 1.5rem;
+  display: flex; align-items: center; justify-content: space-between;
+  background: transparent; border: none; cursor: pointer;
+  transition: background 0.2s, opacity 0.2s;
+  font-family: 'Bricolage Grotesque', sans-serif;
+}
+.form-submit:hover:not(:disabled) { background: var(--card); }
+.form-submit:disabled { opacity: 0.6; cursor: not-allowed; }
+.form-submit span {
+  font-size: 12px; font-weight: 800; letter-spacing: .12em;
+  text-transform: uppercase; color: var(--em);
+}
+.form-submit i { color: var(--muted); font-size: 18px; transition: transform 0.3s; }
+.form-submit:hover:not(:disabled) i { transform: translate(4px, -4px); color: var(--em); }
+
+/* Form status messages */
+.form-status {
+  padding: 1rem 1.5rem;
+  font-size: 13px; font-weight: 600;
+  display: none; border-top: 1px solid var(--border);
+  align-items: center; gap: 8px;
+}
+.form-status.success { display: flex; color: #4ade80; }
+.form-status.error { display: flex; color: var(--em2); }
+
+/* ═══════════════════════════════════════════
+   FOOTER
+═══════════════════════════════════════════ */
+footer {
+  border-top: 1px solid var(--border);
+  padding: 2rem clamp(1.5rem, 5vw, 4rem);
+  display: flex; align-items: center; justify-content: space-between;
+  flex-wrap: wrap; gap: 1rem;
+}
+.footer-logo { font-family: 'Bebas Neue', sans-serif; font-size: 1.3rem; letter-spacing: .05em; color: var(--text); }
+.footer-logo span { color: var(--em); }
+.footer-copy { font-size: 12px; color: var(--muted); letter-spacing: .04em; }
+.footer-links { display: flex; gap: 1.5rem; }
+.footer-links a {
+  font-size: 11px; text-transform: uppercase; letter-spacing: .1em;
+  color: var(--muted); text-decoration: none; transition: color 0.2s;
+}
+.footer-links a:hover { color: var(--em); }
+
+/* ═══════════════════════════════════════════
+   SCROLL REVEAL ANIMATIONS
+═══════════════════════════════════════════ */
+.reveal {
+  opacity: 0; transform: translateY(30px);
+  transition: opacity 0.7s cubic-bezier(.4,0,.2,1), transform 0.7s cubic-bezier(.4,0,.2,1);
+}
+.reveal.in { opacity: 1; transform: translateY(0); }
+
+.reveal-x {
+  opacity: 0; transform: translateX(-30px);
+  transition: opacity 0.7s 0.1s cubic-bezier(.4,0,.2,1), transform 0.7s 0.1s cubic-bezier(.4,0,.2,1);
+}
+.reveal-x.in { opacity: 1; transform: translateX(0); }
+
+.stagger > * {
+  opacity: 0; transform: translateY(20px);
+  transition: opacity 0.5s, transform 0.5s;
+}
+.stagger.in > *:nth-child(1) { opacity:1;transform:none;transition-delay:.05s; }
+.stagger.in > *:nth-child(2) { opacity:1;transform:none;transition-delay:.12s; }
+.stagger.in > *:nth-child(3) { opacity:1;transform:none;transition-delay:.19s; }
+.stagger.in > *:nth-child(4) { opacity:1;transform:none;transition-delay:.26s; }
+
+/* ═══════════════════════════════════════════
+   CUSTOM CURSOR (desktop only)
+═══════════════════════════════════════════ */
+.cursor-dot {
+  position: fixed; width: 6px; height: 6px; border-radius: 50%;
+  background: var(--em); pointer-events: none; z-index: 9999;
+  transform: translate(-50%, -50%); transition: transform .05s;
+}
+.cursor-ring {
+  position: fixed; width: 28px; height: 28px; border-radius: 50%;
+  border: 1px solid rgba(232,255,71,.4); pointer-events: none; z-index: 9999;
+  transform: translate(-50%, -50%); transition: all .14s ease;
+}
+@media (hover: none) { .cursor-dot, .cursor-ring { display: none; } }
+
+/* ═══════════════════════════════════════════
+   SCROLL TO TOP
+═══════════════════════════════════════════ */
+.scroll-top {
+  position: fixed; bottom: 2rem; right: 2rem; z-index: 500;
+  width: 42px; height: 42px;
+  border: 1px solid var(--border); background: var(--surface);
+  border-radius: 2px; cursor: pointer;
+  display: flex; align-items: center; justify-content: center;
+  color: var(--muted); font-size: 14px;
+  opacity: 0; transform: translateY(12px);
+  transition: all 0.3s ease;
+}
+.scroll-top.show { opacity: 1; transform: translateY(0); }
+.scroll-top:hover { border-color: var(--em); color: var(--em); background: var(--card); }
+
+/* ═══════════════════════════════════════════
+   LOADING SPINNER (for form submission)
+═══════════════════════════════════════════ */
+.spinner {
+  width: 16px; height: 16px; border-radius: 50%;
+  border: 2px solid var(--border);
+  border-top-color: var(--em);
+  animation: spin 0.8s linear infinite; display: inline-block;
+}
+@keyframes spin { to { transform: rotate(360deg); } }
+
+/* ═══════════════════════════════════════════
+   RESPONSIVE UTILITIES
+═══════════════════════════════════════════ */
+@media (max-width: 480px) {
+  .stats-row { flex-wrap: wrap; }
+  .stat-box { flex: 1 1 calc(50% - 1px); }
+  .hero-btns { flex-direction: column; }
+  .hero-btns a { justify-content: center; }
+}
+</style>
+</head>
+<body>
+
+<!-- ═══ CUSTOM CURSOR ═══ -->
+<div class="cursor-dot" id="cdot"></div>
+<div class="cursor-ring" id="cring"></div>
+
+<!-- ═══ SCROLL TO TOP ═══ -->
+<button class="scroll-top" id="scrollTop" aria-label="Scroll to top">
+  <i class="fa-solid fa-chevron-up"></i>
+</button>
+
+<!-- ══════════════════════════════════════════
+     NAVBAR
+══════════════════════════════════════════ -->
+<nav id="navbar">
+  <a href="#home" class="nav-logo">E<span>M</span></a>
+
+  <!-- Desktop nav links -->
+  <ul class="nav-links" id="navLinks">
+    <li><a href="#home" class="active" data-i18n="nav.home">Home</a></li>
+    <li><a href="#about" data-i18n="nav.about">About</a></li>
+    <li><a href="#skills" data-i18n="nav.skills">Skills</a></li>
+    <li><a href="#projects" data-i18n="nav.projects">Projects</a></li>
+    <li><a href="#certificates" data-i18n="nav.certs">Certs</a></li>
+    <li><a href="#contact" data-i18n="nav.contact">Contact</a></li>
+  </ul>
+
+  <div class="nav-right">
+    <!-- Language switcher -->
+    <div class="lang-switcher" id="langSwitcher">
+      <button class="lang-btn" id="langBtn" aria-label="Language">
+        <i class="fa-solid fa-globe"></i>
+        <span id="langLabel">EN</span>
+        <i class="fa-solid fa-chevron-down"></i>
+      </button>
+      <div class="lang-dropdown" id="langDropdown">
+        <div class="lang-option active" data-lang="en">
+          <span class="flag">🇬🇧</span> English
+        </div>
+        <div class="lang-option" data-lang="fr">
+          <span class="flag">🇫🇷</span> Français
+        </div>
+      </div>
+    </div>
+
+    <!-- Theme toggle — sun/moon pill -->
+    <button class="theme-toggle" id="themeToggle" aria-label="Toggle theme">
+      <div class="theme-toggle-thumb">
+        <i class="fa-solid fa-moon" id="themeIcon"></i>
+      </div>
+    </button>
+
+    <!-- Hamburger -->
+    <button class="hamburger" id="hamburger" aria-label="Menu">
+      <span></span><span></span><span></span>
+    </button>
+  </div>
+</nav>
+
+<!-- Mobile menu -->
+<div id="mob-menu">
+  <a href="#home" data-i18n="nav.home">Home</a>
+  <a href="#about" data-i18n="nav.about">About</a>
+  <a href="#skills" data-i18n="nav.skills">Skills</a>
+  <a href="#projects" data-i18n="nav.projects">Projects</a>
+  <a href="#certificates" data-i18n="nav.certs">Certificates</a>
+  <a href="#contact" data-i18n="nav.contact">Contact</a>
+</div>
+
+<!-- ══════════════════════════════════════════
+     HERO
+══════════════════════════════════════════ -->
+<section id="home">
+  <!-- Background orbs -->
+  <div class="hero-orb hero-orb-1"></div>
+  <div class="hero-orb hero-orb-2"></div>
+  <div class="hero-bg-num">EM</div>
+
+  <div class="wrap" style="position:relative;z-index:1">
+    <div style="display:flex;align-items:flex-start;justify-content:space-between;gap:2rem;flex-wrap:wrap">
+      <div style="flex:1;min-width:280px">
+        <div style="margin-bottom:1.5rem;margin-top:15px">
+          <div class="hero-badge">
+            <span class="hero-badge-dot"></span>
+            <span data-i18n="hero.badge">Available for work</span>
+          </div>
+        </div>
+        <div class="hero-name">
+          Mohammed<br><span class="hl">El harcha</span>
+        </div>
+        <div class="hero-type">
+          <span id="typed"></span><span class="cursor2"></span>
+        </div>
+      </div>
+    </div>
+
+    <div style="margin-top:2.5rem">
+      <div class="hero-desc">
+        <p data-i18n="hero.desc">Passionate <strong>full-stack developer</strong> from Morocco — building scalable web products with <strong>React, Node.js, MongoDB & Laravel</strong></p>
+        <div class="hero-btns">
+          <a href="#projects" class="btn-a">
+            <i class="fa-solid fa-code-branch" style="font-size:11px"></i>
+            <span data-i18n="hero.cta1">View Projects</span>
+          </a>
+          <a href="#contact" class="btn-b">
+            <i class="fa-regular fa-envelope" style="font-size:11px"></i>
+            <span data-i18n="hero.cta2">Contact Me</span>
+          </a>
+        </div>
+      </div>
+    </div>
+
+    <div class="stats-row stagger reveal" style="margin-top:4rem">
+      <div class="stat-box">
+        <div class="stat-num">2+</div>
+        <div class="stat-label" data-i18n="hero.stat1">Years experience</div>
+      </div>
+      <div class="stat-box">
+        <div class="stat-num">10+</div>
+        <div class="stat-label" data-i18n="hero.stat2">Projects shipped</div>
+      </div>
+      <div class="stat-box">
+        <div class="stat-num">10+</div>
+        <div class="stat-label" data-i18n="hero.stat3">Happy clients</div>
+      </div>
+      <div class="stat-box">
+        <div class="stat-num">4</div>
+        <div class="stat-label" data-i18n="hero.stat4">Core stacks</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ══════════════════════════════════════════
+     ABOUT
+══════════════════════════════════════════ -->
+<section id="about" style="padding:7rem 0">
+  <div class="wrap">
+    <div class="sec-header reveal">
+      <span class="sec-num">01</span>
+      <h2 class="sec-title" data-i18n="about.title">About <span>Me</span></h2>
+      <div class="sec-line"></div>
+    </div>
+    <div class="about-grid">
+      <div class="reveal-x">
+        <div class="about-text">
+          <p data-i18n="about.p1">I'm <em>Mohammed El harcha</em>, a passionate full-stack web developer based in <strong>Casablanca, Morocco</strong>. I build products that are fast, beautiful, and built to scale.</p>
+          <p data-i18n="about.p2">My stack spans <strong>React / Next.js</strong> on the front, <strong>Node.js & Laravel</strong> on the back, and <strong>MongoDB & MySQL</strong> for data. I care deeply about clean architecture and elegant code.</p>
+          <p data-i18n="about.p3">I'm especially drawn to <strong>social media platforms</strong> and <strong>SaaS products</strong> — spaces where great engineering meets real user impact.</p>
+          <p data-i18n="about.p4">Outside of code: design, open source, and turning coffee into ambitious side projects ☕</p>
+        </div>
+        <div class="about-tags">
+          <span class="tag">React</span><span class="tag">Next.js</span>
+          <span class="tag">Node.js</span><span class="tag">Laravel</span>
+          <span class="tag">MongoDB</span><span class="tag">MySQL</span>
+          <span class="tag">TypeScript</span><span class="tag">Docker</span>
+          <span class="tag">REST APIs</span><span class="tag">SaaS</span>
+          <span class="tag">Angular</span><span class="tag">Python</span>
+          <span class="tag">WordPress</span>
+        </div>
+        <div style="margin-top:2rem">
+          <a href="#" class="btn-a" style="font-size:11px;padding:11px 22px" download>
+            <i class="fa-solid fa-download" style="font-size:10px"></i>
+            <span data-i18n="about.cv">Download CV</span>
+          </a>
+        </div>
+      </div>
+      <div class="reveal">
+        <div class="about-details">
+          <div class="detail-row"><span class="detail-key" data-i18n="about.key.name">Name</span><span class="detail-val">Mohammed El harcha</span></div>
+          <div class="detail-row"><span class="detail-key" data-i18n="about.key.role">Role</span><span class="detail-val" data-i18n="about.val.role">Full-Stack Developer</span></div>
+          <div class="detail-row"><span class="detail-key" data-i18n="about.key.location">Location</span><span class="detail-val" data-i18n="about.val.location">Casablanca, Morocco</span></div>
+          <div class="detail-row"><span class="detail-key" data-i18n="about.key.exp">Experience</span><span class="detail-val" data-i18n="about.val.exp">2+ Years</span></div>
+          <div class="detail-row"><span class="detail-key" data-i18n="about.key.focus">Focus</span><span class="detail-val">SaaS · Social Apps · Data</span></div>
+          <div class="detail-row"><span class="detail-key" data-i18n="about.key.status">Status</span><span class="detail-val green">● <span data-i18n="about.val.status">Open to Work</span></span></div>
+          <div class="detail-row"><span class="detail-key" data-i18n="about.key.email">Email</span><span class="detail-val" style="font-size:12px">mohammed.elharcha.pro@gmail.com</span></div>
+          <div class="detail-row"><span class="detail-key" data-i18n="about.key.lang">Languages</span><span class="detail-val" data-i18n="about.val.lang">Arabic · French · English</span></div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ══════════════════════════════════════════
+     SKILLS
+══════════════════════════════════════════ -->
+<section id="skills" style="padding:7rem 0">
+  <div class="wrap">
+    <div class="sec-header reveal">
+      <span class="sec-num">02</span>
+      <h2 class="sec-title" data-i18n="skills.title">Tech <span>Stack</span></h2>
+      <div class="sec-line"></div>
+    </div>
+    <div class="skills-grid reveal">
+      <!-- Frontend -->
+      <div class="skill-col">
+        <div class="skill-col-title" data-i18n="skills.frontend">Frontend</div>
+        <div class="skill-item"><div class="skill-row"><span class="skill-name">React.js</span><span class="skill-pct">90%</span></div><div class="bar-bg"><div class="bar-fg" data-w="90"></div></div></div>
+        <div class="skill-item"><div class="skill-row"><span class="skill-name">Next.js</span><span class="skill-pct">85%</span></div><div class="bar-bg"><div class="bar-fg" data-w="85"></div></div></div>
+        <div class="skill-item"><div class="skill-row"><span class="skill-name">TypeScript</span><span class="skill-pct">80%</span></div><div class="bar-bg"><div class="bar-fg" data-w="80"></div></div></div>
+        <div class="skill-item"><div class="skill-row"><span class="skill-name">Tailwind CSS</span><span class="skill-pct">90%</span></div><div class="bar-bg"><div class="bar-fg" data-w="90"></div></div></div>
+        <div class="skill-item"><div class="skill-row"><span class="skill-name">Redux / Zustand</span><span class="skill-pct">75%</span></div><div class="bar-bg"><div class="bar-fg" data-w="75"></div></div></div>
+        <div class="skill-item"><div class="skill-row"><span class="skill-name">Angular</span><span class="skill-pct">50%</span></div><div class="bar-bg"><div class="bar-fg" data-w="50"></div></div></div>
+      </div>
+      <!-- Backend -->
+      <div class="skill-col">
+        <div class="skill-col-title" data-i18n="skills.backend">Backend</div>
+        <div class="skill-item"><div class="skill-row"><span class="skill-name">Node.js</span><span class="skill-pct">85%</span></div><div class="bar-bg"><div class="bar-fg blue" data-w="85"></div></div></div>
+        <div class="skill-item"><div class="skill-row"><span class="skill-name">Laravel / PHP</span><span class="skill-pct">82%</span></div><div class="bar-bg"><div class="bar-fg blue" data-w="82"></div></div></div>
+        <div class="skill-item"><div class="skill-row"><span class="skill-name">Python</span><span class="skill-pct">50%</span></div><div class="bar-bg"><div class="bar-fg blue" data-w="50"></div></div></div>
+        <div class="skill-item"><div class="skill-row"><span class="skill-name">Express.js</span><span class="skill-pct">85%</span></div><div class="bar-bg"><div class="bar-fg blue" data-w="85"></div></div></div>
+        <div class="skill-item"><div class="skill-row"><span class="skill-name">MongoDB</span><span class="skill-pct">80%</span></div><div class="bar-bg"><div class="bar-fg blue" data-w="80"></div></div></div>
+        <div class="skill-item"><div class="skill-row"><span class="skill-name">MySQL</span><span class="skill-pct">80%</span></div><div class="bar-bg"><div class="bar-fg blue" data-w="80"></div></div></div>
+        <div class="skill-item"><div class="skill-row"><span class="skill-name">REST / GraphQL</span><span class="skill-pct">78%</span></div><div class="bar-bg"><div class="bar-fg blue" data-w="78"></div></div></div>
+      </div>
+      <!-- Tools -->
+      <div class="skill-col">
+        <div class="skill-col-title" data-i18n="skills.devops">Tools & DevOps</div>
+        <div class="skill-item"><div class="skill-row"><span class="skill-name">Git / GitHub</span><span class="skill-pct">92%</span></div><div class="bar-bg"><div class="bar-fg red" data-w="92"></div></div></div>
+        <div class="skill-item"><div class="skill-row"><span class="skill-name">Docker</span><span class="skill-pct">70%</span></div><div class="bar-bg"><div class="bar-fg red" data-w="70"></div></div></div>
+        <div class="skill-item"><div class="skill-row"><span class="skill-name">Linux / CLI</span><span class="skill-pct">75%</span></div><div class="bar-bg"><div class="bar-fg red" data-w="75"></div></div></div>
+        <div class="skill-item"><div class="skill-row"><span class="skill-name">Figma</span><span class="skill-pct">70%</span></div><div class="bar-bg"><div class="bar-fg red" data-w="70"></div></div></div>
+        <div class="skill-item"><div class="skill-row"><span class="skill-name">Vercel / Railway</span><span class="skill-pct">78%</span></div><div class="bar-bg"><div class="bar-fg red" data-w="78"></div></div></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ══════════════════════════════════════════
+     PROJECTS
+══════════════════════════════════════════ -->
+<section id="projects" style="padding:7rem 0">
+  <div class="wrap">
+    <div class="sec-header reveal">
+      <span class="sec-num">03</span>
+      <h2 class="sec-title" data-i18n="projects.title">Featured <span>Work</span></h2>
+      <div class="sec-line"></div>
+    </div>
+    <div class="projects-grid reveal">
+      <!-- Featured: Jouala -->
+      <div class="proj-card featured">
+        <div class="proj-visual" style="background:linear-gradient(135deg,#8792e6,#ffffff)">
+          <img src="data/picture/JOUALA.png" style="width:80%;height:80%;object-fit:cover" alt="Jouala project" onerror="this.style.display='none'">
+          <div class="proj-visual-label" data-i18n="projects.featured">Featured</div>
+        </div>
+        <div class="proj-body" style="display:flex;flex-direction:column;justify-content:center">
+          <div class="proj-tags">
+            <span class="proj-tag">React</span>
+            <span class="proj-tag">Node.js</span>
+            <span class="proj-tag">MongoDB</span>
+            <span class="proj-tag">Socket.io</span>
+          </div>
+          <div class="proj-name">Jouala</div>
+          <p class="proj-desc" data-i18n="projects.jouala.desc">A full-featured social media platform with real-time feeds, stories, direct messaging, notifications, and follower system. Built for thousands of concurrent users with a clean, mobile-first design.</p>
+          <div class="proj-actions">
+            <a href="#" class="proj-btn proj-btn-fill">
+              <i class="fa-solid fa-arrow-up-right-from-square" style="font-size:10px"></i>
+              <span data-i18n="projects.live">Live Demo</span>
+            </a>
+            <a href="#" class="proj-btn proj-btn-out">
+              <i class="fa-brands fa-github" style="font-size:10px"></i>GitHub
+            </a>
+          </div>
+        </div>
+      </div>
+      <!-- E-commerce -->
+      <div class="proj-card">
+        <div class="proj-visual" style="background:linear-gradient(135deg,#eb804f,#fff3e0)">
+          <img src="data/picture/Shopart.png" style="width:65%;height:100%;object-fit:cover" alt="Shopart" onerror="this.style.display='none'">
+        </div>
+        <div class="proj-body">
+          <div class="proj-tags">
+            <span class="proj-tag">PHP</span>
+            <span class="proj-tag">TailwindCSS</span>
+            <span class="proj-tag">MySQL</span>
+          </div>
+          <div class="proj-name">SHOPART</div>
+          <p class="proj-desc" data-i18n="projects.shopart.desc">Modern e-commerce with product catalog, cart management, Stripe payments, and a full admin dashboard for inventory and orders.</p>
+          <div class="proj-actions">
+            <a href="#" class="proj-btn proj-btn-fill" style="font-size:10px;padding:7px 14px">
+              <i class="fa-solid fa-arrow-up-right-from-square" style="font-size:9px"></i>
+              <span data-i18n="projects.live">Live</span>
+            </a>
+            <a href="#" class="proj-btn proj-btn-out" style="font-size:10px;padding:7px 14px">
+              <i class="fa-brands fa-github" style="font-size:9px"></i>GitHub
+            </a>
+          </div>
+        </div>
+      </div>
+      <!-- Lhouma -->
+      <div class="proj-card">
+        <div class="proj-visual" style="background:linear-gradient(135deg,#001a10,#003020)">
+          <img src="data/picture/LOGOLHOUMA.png" style="width:90%;height:90%;object-fit:cover" alt="Lhouma" onerror="this.style.display='none'">
+        </div>
+        <div class="proj-body">
+          <div class="proj-tags">
+            <span class="proj-tag">React</span>
+            <span class="proj-tag">Laravel</span>
+            <span class="proj-tag">MySQL</span>
+          </div>
+          <div class="proj-name">LHOUMA</div>
+          <p class="proj-desc" data-i18n="projects.lhouma.desc">Travel destination discovery platform. Browse, review, and share trips with authentication, booking flow, and admin moderation.</p>
+          <div class="proj-actions">
+            <a href="#" class="proj-btn proj-btn-fill" style="font-size:10px;padding:7px 14px">
+              <i class="fa-solid fa-arrow-up-right-from-square" style="font-size:9px"></i>
+              <span data-i18n="projects.live">Live</span>
+            </a>
+            <a href="#" class="proj-btn proj-btn-out" style="font-size:10px;padding:7px 14px">
+              <i class="fa-brands fa-github" style="font-size:9px"></i>GitHub
+            </a>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ══════════════════════════════════════════
+     CERTIFICATES
+══════════════════════════════════════════ -->
+<section id="certificates" style="padding:7rem 0">
+  <div class="wrap">
+    <div class="sec-header reveal">
+      <span class="sec-num">04</span>
+      <h2 class="sec-title" data-i18n="certs.title">Certifi<span>cates</span></h2>
+      <div class="sec-line"></div>
+    </div>
+    <div class="certs-list reveal">
+
+      <!-- Each cert-row has data attributes for the modal -->
+      <div class="cert-row" data-cert-name="Meta Front-End Developer Professional Certificate" data-cert-issuer="Meta · 2024" data-cert-url="#" onclick="openCertModal(this)">
+        <div class="cert-idx">01</div>
+        <div>
+          <div class="cert-issuer">Meta · 2024</div>
+          <div class="cert-name" data-i18n="certs.c1">Meta Front-End Developer Professional Certificate</div>
+        </div>
+        <div class="cert-meta">
+          <div class="cert-date">Jan 2024</div>
+          <button class="cert-view-btn" data-i18n="certs.view">
+            <span>View</span> <i class="fa-solid fa-arrow-up-right-from-square" style="font-size:9px"></i>
+          </button>
+        </div>
+      </div>
+
+      <div class="cert-row" data-cert-name="Full-Stack Web Development Specialization" data-cert-issuer="Coursera · 2023" data-cert-url="#" onclick="openCertModal(this)">
+        <div class="cert-idx">02</div>
+        <div>
+          <div class="cert-issuer">Coursera · 2023</div>
+          <div class="cert-name" data-i18n="certs.c2">Full-Stack Web Development Specialization</div>
+        </div>
+        <div class="cert-meta">
+          <div class="cert-date">Oct 2023</div>
+          <button class="cert-view-btn" data-i18n="certs.view">
+            <span>View</span> <i class="fa-solid fa-arrow-up-right-from-square" style="font-size:9px"></i>
+          </button>
+        </div>
+      </div>
+
+      <div class="cert-row" data-cert-name="JavaScript Algorithms and Data Structures" data-cert-issuer="freeCodeCamp · 2022" data-cert-url="#" onclick="openCertModal(this)">
+        <div class="cert-idx">03</div>
+        <div>
+          <div class="cert-issuer">freeCodeCamp · 2022</div>
+          <div class="cert-name" data-i18n="certs.c3">JavaScript Algorithms and Data Structures</div>
+        </div>
+        <div class="cert-meta">
+          <div class="cert-date">Aug 2022</div>
+          <button class="cert-view-btn" data-i18n="certs.view">
+            <span>View</span> <i class="fa-solid fa-arrow-up-right-from-square" style="font-size:9px"></i>
+          </button>
+        </div>
+      </div>
+
+      <div class="cert-row" data-cert-name="Laravel Advanced Masterclass — APIs & Architecture" data-cert-issuer="Udemy · 2023" data-cert-url="#" onclick="openCertModal(this)">
+        <div class="cert-idx">04</div>
+        <div>
+          <div class="cert-issuer">Udemy · 2023</div>
+          <div class="cert-name" data-i18n="certs.c4">Laravel Advanced Masterclass — APIs & Architecture</div>
+        </div>
+        <div class="cert-meta">
+          <div class="cert-date">Mar 2023</div>
+          <button class="cert-view-btn" data-i18n="certs.view">
+            <span>View</span> <i class="fa-solid fa-arrow-up-right-from-square" style="font-size:9px"></i>
+          </button>
+        </div>
+      </div>
+
+      <div class="cert-row" data-cert-name="MongoDB Certified Developer Associate" data-cert-issuer="MongoDB University · 2023" data-cert-url="#" onclick="openCertModal(this)">
+        <div class="cert-idx">05</div>
+        <div>
+          <div class="cert-issuer">MongoDB University · 2023</div>
+          <div class="cert-name" data-i18n="certs.c5">MongoDB Certified Developer Associate</div>
+        </div>
+        <div class="cert-meta">
+          <div class="cert-date">Jun 2023</div>
+          <button class="cert-view-btn" data-i18n="certs.view">
+            <span>View</span> <i class="fa-solid fa-arrow-up-right-from-square" style="font-size:9px"></i>
+          </button>
+        </div>
+      </div>
+
+    </div>
+  </div>
+</section>
+
+<!-- Certificate Modal -->
+<div class="cert-modal-overlay" id="certModalOverlay" role="dialog" aria-modal="true">
+  <div class="cert-modal" id="certModal">
+    <div class="cert-modal-header">
+      <div>
+        <div class="cert-modal-title" id="certModalTitle">Certificate Name</div>
+        <div class="cert-modal-issuer" id="certModalIssuer">Issuer</div>
+      </div>
+      <div class="cert-modal-actions">
+        <a href="#" class="cert-modal-download" id="certModalDownload" download>
+          <i class="fa-solid fa-download" style="font-size:10px"></i>
+          <span data-i18n="certs.download">Download</span>
+        </a>
+        <button class="cert-modal-close" onclick="closeCertModal()" aria-label="Close">
+          <i class="fa-solid fa-xmark"></i>
+        </button>
+      </div>
+    </div>
+    <div class="cert-modal-body" id="certModalBody">
+      <div class="cert-placeholder">
+        <i class="fa-regular fa-file-certificate" style="font-size:3rem;color:var(--muted)"></i>
+        <p data-i18n="certs.placeholder">Add your certificate image or PDF link<br>in the <code>data-cert-url</code> attribute of the row.</p>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════════
+     CONTACT
+══════════════════════════════════════════ -->
+<section id="contact" style="padding:7rem 0">
+  <div class="wrap">
+    <div class="sec-header reveal">
+      <span class="sec-num">05</span>
+      <h2 class="sec-title" data-i18n="contact.title">Get In <span>Touch</span></h2>
+      <div class="sec-line"></div>
+    </div>
+    <div class="contact-grid">
+      <div class="contact-info reveal-x">
+        <div class="contact-tagline">
+          <span data-i18n="contact.tagline1">Let's build something</span><br>
+          <span class="em" style="color:var(--em)" data-i18n="contact.tagline2">great together.</span>
+          <small data-i18n="contact.sub">Have a project in mind? Open to freelance opportunities, collaborations, or full-time roles. I respond within 24 hours.</small>
+        </div>
+        <div>
+          <div style="font-size:11px;text-transform:uppercase;letter-spacing:.12em;color:var(--muted);margin-bottom:12px" data-i18n="contact.findme">Find me on</div>
+          <div class="socials">
+            <a href="#" class="soc-btn" title="GitHub"><i class="fa-brands fa-github"></i></a>
+            <a href="#" class="soc-btn" title="LinkedIn"><i class="fa-brands fa-linkedin-in"></i></a>
+            <a href="#" class="soc-btn" title="Instagram"><i class="fa-brands fa-instagram"></i></a>
+            <a href="#" class="soc-btn" title="X / Twitter"><i class="fa-brands fa-x-twitter"></i></a>
+          </div>
+        </div>
+        <div>
+          <div style="font-size:11px;text-transform:uppercase;letter-spacing:.12em;color:var(--muted);margin-bottom:8px" data-i18n="contact.email">Email directly</div>
+          <span style="color:var(--em);font-weight:600;font-size:14px">mohammed.elharcha.pro@gmail.com</span>
+        </div>
+      </div>
+
+      <!-- ═══ CONTACT FORM with EmailJS ═══ -->
+      <div class="reveal">
+        <form class="contact-form" id="contactForm" novalidate>
+
+          <div class="form-row">
+            <!-- Name field -->
+            <div class="form-field" id="field-name">
+              <div class="form-label" data-i18n="contact.form.name">Name</div>
+              <input type="text" class="form-input" id="inp-name" placeholder="Your name" autocomplete="name"/>
+              <div class="form-error-msg" data-i18n="contact.err.name">Please enter your name.</div>
+            </div>
+            <!-- Email field -->
+            <div class="form-field" id="field-email">
+              <div class="form-label" data-i18n="contact.form.email">Email</div>
+              <input type="email" class="form-input" id="inp-email" placeholder="your@email.com" autocomplete="email"/>
+              <div class="form-error-msg" data-i18n="contact.err.email">Please enter a valid email.</div>
+            </div>
+          </div>
+
+          <!-- Subject field -->
+          <div class="form-field" id="field-subject" style="border-bottom:1px solid var(--border)">
+            <div class="form-label" data-i18n="contact.form.subject">Subject</div>
+            <input type="text" class="form-input" id="inp-subject" placeholder="Project inquiry..."/>
+          </div>
+
+          <!-- Message field -->
+          <div class="form-field" id="field-message" style="border-bottom:1px solid var(--border)">
+            <div class="form-label" data-i18n="contact.form.message">Message</div>
+            <textarea class="form-textarea" id="inp-message" placeholder="Tell me about your project, timeline, and budget..."></textarea>
+            <div class="form-error-msg" data-i18n="contact.err.message">Please write a message (min 10 chars).</div>
+          </div>
+
+          <!-- Submit row -->
+          <div class="form-submit-row">
+            <button type="submit" class="form-submit" id="submitBtn">
+              <span id="submitLabel" data-i18n="contact.send">Send Message →</span>
+              <i class="fa-solid fa-arrow-up-right" id="submitIcon"></i>
+            </button>
+          </div>
+
+          <!-- Status message -->
+          <div class="form-status" id="formStatus"></div>
+        </form>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ══════════════════════════════════════════
+     FOOTER
+══════════════════════════════════════════ -->
+<footer>
+  <div class="footer-logo">E<span>M</span></div>
+  <div class="footer-copy">© 2025 EM — <span data-i18n="footer.made">Crafted in Morocco</span></div>
+  <div class="footer-links">
+    <a href="#home" data-i18n="nav.home">Home</a>
+    <a href="#projects" data-i18n="nav.projects">Work</a>
+    <a href="#contact" data-i18n="nav.contact">Contact</a>
+  </div>
+</footer>
+
+
+<!-- ══════════════════════════════════════════
+     JAVASCRIPT
+══════════════════════════════════════════ -->
+<script>
+/* ═══════════════════════════════════════════
+   1. TRANSLATIONS (i18n JSON system)
+   Add more keys here to translate any element
+   that has a [data-i18n] attribute.
+═══════════════════════════════════════════ */
+const translations = {
+  en: {
+    "nav.home": "Home",
+    "nav.about": "About",
+    "nav.skills": "Skills",
+    "nav.projects": "Projects",
+    "nav.certs": "Certs",
+    "nav.contact": "Contact",
+    "hero.badge": "Available for work",
+    "hero.desc": "Passionate <strong>full-stack developer</strong> from Morocco — building scalable web products with <strong>React, Node.js, MongoDB & Laravel</strong>",
+    "hero.cta1": "View Projects",
+    "hero.cta2": "Contact Me",
+    "hero.stat1": "Years experience",
+    "hero.stat2": "Projects shipped",
+    "hero.stat3": "Happy clients",
+    "hero.stat4": "Core stacks",
+    "about.title": "About <span>Me</span>",
+    "about.p1": "I'm <em>Mohammed El harcha</em>, a passionate full-stack web developer based in <strong>Casablanca, Morocco</strong>. I build products that are fast, beautiful, and built to scale.",
+    "about.p2": "My stack spans <strong>React / Next.js</strong> on the front, <strong>Node.js & Laravel</strong> on the back, and <strong>MongoDB & MySQL</strong> for data. I care deeply about clean architecture and elegant code.",
+    "about.p3": "I'm especially drawn to <strong>social media platforms</strong> and <strong>SaaS products</strong> — spaces where great engineering meets real user impact.",
+    "about.p4": "Outside of code: design, open source, and turning coffee into ambitious side projects ☕",
+    "about.cv": "Download CV",
+    "about.key.name": "Name",
+    "about.key.role": "Role",
+    "about.key.location": "Location",
+    "about.key.exp": "Experience",
+    "about.key.focus": "Focus",
+    "about.key.status": "Status",
+    "about.key.email": "Email",
+    "about.key.lang": "Languages",
+    "about.val.role": "Full-Stack Developer",
+    "about.val.location": "Casablanca, Morocco",
+    "about.val.exp": "2+ Years",
+    "about.val.status": "Open to Work",
+    "about.val.lang": "Arabic · French · English",
+    "skills.title": "Tech <span>Stack</span>",
+    "skills.frontend": "Frontend",
+    "skills.backend": "Backend",
+    "skills.devops": "Tools & DevOps",
+    "projects.title": "Featured <span>Work</span>",
+    "projects.featured": "Featured",
+    "projects.live": "Live Demo",
+    "projects.jouala.desc": "A full-featured social media platform with real-time feeds, stories, direct messaging, notifications, and follower system. Built for thousands of concurrent users.",
+    "projects.shopart.desc": "Modern e-commerce with product catalog, cart management, Stripe payments, and a full admin dashboard for inventory and orders.",
+    "projects.lhouma.desc": "Travel destination discovery platform. Browse, review, and share trips with authentication, booking flow, and admin moderation.",
+    "certs.title": "Certifi<span>cates</span>",
+    "certs.c1": "Meta Front-End Developer Professional Certificate",
+    "certs.c2": "Full-Stack Web Development Specialization",
+    "certs.c3": "JavaScript Algorithms and Data Structures",
+    "certs.c4": "Laravel Advanced Masterclass — APIs & Architecture",
+    "certs.c5": "MongoDB Certified Developer Associate",
+    "certs.view": "View",
+    "certs.download": "Download",
+    "certs.placeholder": "Add your certificate image or PDF link\nin the data-cert-url attribute of the row.",
+    "contact.title": "Get In <span>Touch</span>",
+    "contact.tagline1": "Let's build something",
+    "contact.tagline2": "great together.",
+    "contact.sub": "Have a project in mind? Open to freelance opportunities, collaborations, or full-time roles. I respond within 24 hours.",
+    "contact.findme": "Find me on",
+    "contact.email": "Email directly",
+    "contact.form.name": "Name",
+    "contact.form.email": "Email",
+    "contact.form.subject": "Subject",
+    "contact.form.message": "Message",
+    "contact.send": "Send Message →",
+    "contact.err.name": "Please enter your name.",
+    "contact.err.email": "Please enter a valid email.",
+    "contact.err.message": "Please write a message (min 10 chars).",
+    "contact.success": "✓ Message sent! I'll get back to you within 24h.",
+    "contact.error": "✗ Oops! Something went wrong. Please try again or email me directly.",
+    "contact.sending": "Sending...",
+    "footer.made": "Crafted in Morocco",
+  },
+  fr: {
+    "nav.home": "Accueil",
+    "nav.about": "À propos",
+    "nav.skills": "Compétences",
+    "nav.projects": "Projets",
+    "nav.certs": "Certifs",
+    "nav.contact": "Contact",
+    "hero.badge": "Disponible pour travailler",
+    "hero.desc": "Développeur <strong>full-stack</strong> passionné du Maroc — créant des produits web avec <strong>React, Node.js, MongoDB & Laravel</strong>",
+    "hero.cta1": "Voir les Projets",
+    "hero.cta2": "Me Contacter",
+    "hero.stat1": "Ans d'expérience",
+    "hero.stat2": "Projets livrés",
+    "hero.stat3": "Clients satisfaits",
+    "hero.stat4": "Stacks maîtrisés",
+    "about.title": "À <span>Propos</span>",
+    "about.p1": "Je suis <em>Mohammed El harcha</em>, développeur web full-stack basé à <strong>Casablanca, Maroc</strong>. Je crée des produits rapides, beaux et scalables.",
+    "about.p2": "Mon stack couvre <strong>React / Next.js</strong> côté front, <strong>Node.js & Laravel</strong> côté back, et <strong>MongoDB & MySQL</strong> pour les données.",
+    "about.p3": "Je suis particulièrement attiré par les <strong>plateformes sociales</strong> et les <strong>produits SaaS</strong>.",
+    "about.p4": "En dehors du code : design, open source, et transformer le café en projets ambitieux ☕",
+    "about.cv": "Télécharger CV",
+    "about.key.name": "Nom",
+    "about.key.role": "Rôle",
+    "about.key.location": "Lieu",
+    "about.key.exp": "Expérience",
+    "about.key.focus": "Focus",
+    "about.key.status": "Statut",
+    "about.key.email": "Email",
+    "about.key.lang": "Langues",
+    "about.val.role": "Développeur Full-Stack",
+    "about.val.location": "Casablanca, Maroc",
+    "about.val.exp": "2+ ans",
+    "about.val.status": "Disponible",
+    "about.val.lang": "Arabe · Français · Anglais",
+    "skills.title": "Stack <span>Technique</span>",
+    "skills.frontend": "Frontend",
+    "skills.backend": "Backend",
+    "skills.devops": "Outils & DevOps",
+    "projects.title": "Projets <span>Réalisés</span>",
+    "projects.featured": "En vedette",
+    "projects.live": "Démo Live",
+    "projects.jouala.desc": "Plateforme de réseau social complète avec flux temps réel, stories, messagerie directe, notifications et système de followers.",
+    "projects.shopart.desc": "E-commerce moderne avec catalogue, gestion du panier, paiements Stripe et tableau de bord admin complet.",
+    "projects.lhouma.desc": "Plateforme de découverte de destinations. Parcourez, évaluez et partagez des voyages avec authentification et modération.",
+    "certs.title": "Certifi<span>cats</span>",
+    "certs.c1": "Certificat Professionnel Meta Front-End Developer",
+    "certs.c2": "Spécialisation Développement Web Full-Stack",
+    "certs.c3": "Algorithmes JavaScript et Structures de Données",
+    "certs.c4": "Masterclass Avancée Laravel — APIs & Architecture",
+    "certs.c5": "Développeur Certifié MongoDB Associate",
+    "certs.view": "Voir",
+    "certs.download": "Télécharger",
+    "certs.placeholder": "Ajoutez l'URL de votre certificat\ndans l'attribut data-cert-url de la ligne.",
+    "contact.title": "Prenons <span>Contact</span>",
+    "contact.tagline1": "Construisons quelque chose",
+    "contact.tagline2": "d'exceptionnel ensemble.",
+    "contact.sub": "Un projet en tête ? Ouvert aux opportunités freelance, collaborations ou postes à temps plein. Je réponds sous 24h.",
+    "contact.findme": "Retrouvez-moi sur",
+    "contact.email": "Email direct",
+    "contact.form.name": "Nom",
+    "contact.form.email": "Email",
+    "contact.form.subject": "Sujet",
+    "contact.form.message": "Message",
+    "contact.send": "Envoyer →",
+    "contact.err.name": "Veuillez entrer votre nom.",
+    "contact.err.email": "Veuillez entrer un email valide.",
+    "contact.err.message": "Veuillez écrire un message (min 10 caractères).",
+    "contact.success": "✓ Message envoyé ! Je vous répondrai sous 24h.",
+    "contact.error": "✗ Une erreur s'est produite. Veuillez réessayer ou m'écrire directement.",
+    "contact.sending": "Envoi en cours...",
+    "footer.made": "Créé au Maroc",
+  }
+};
+
+/* Apply translations across the entire page */
+let currentLang = localStorage.getItem('lang') || 'en';
+
+function applyTranslations(lang) {
+  currentLang = lang;
+  localStorage.setItem('lang', lang);
+  const t = translations[lang];
+
+  document.querySelectorAll('[data-i18n]').forEach(el => {
+    const key = el.dataset.i18n;
+    if (t[key]) {
+      /* Use innerHTML for rich text keys (containing HTML tags) */
+      el.innerHTML = t[key];
+    }
+  });
+
+  /* Update lang label in the button */
+  document.getElementById('langLabel').textContent = lang.toUpperCase();
+
+  /* Mark active option */
+  document.querySelectorAll('.lang-option').forEach(opt => {
+    opt.classList.toggle('active', opt.dataset.lang === lang);
+  });
+
+  /* Update html lang attribute */
+  document.documentElement.lang = lang;
+}
+
+/* ═══════════════════════════════════════════
+   2. LANGUAGE SWITCHER
+═══════════════════════════════════════════ */
+const langBtn = document.getElementById('langBtn');
+const langDropdown = document.getElementById('langDropdown');
+
+langBtn.addEventListener('click', (e) => {
+  e.stopPropagation();
+  const isOpen = langDropdown.classList.contains('open');
+  langDropdown.classList.toggle('open', !isOpen);
+  langBtn.classList.toggle('open', !isOpen);
+});
+
+document.querySelectorAll('.lang-option').forEach(opt => {
+  opt.addEventListener('click', () => {
+    applyTranslations(opt.dataset.lang);
+    langDropdown.classList.remove('open');
+    langBtn.classList.remove('open');
+  });
+});
+
+/* Close dropdown when clicking outside */
+document.addEventListener('click', () => {
+  langDropdown.classList.remove('open');
+  langBtn.classList.remove('open');
+});
+
+/* ═══════════════════════════════════════════
+   3. THEME TOGGLE (dark/light) with localStorage
+═══════════════════════════════════════════ */
+const html = document.documentElement;
+const themeToggle = document.getElementById('themeToggle');
+const themeIcon = document.getElementById('themeIcon');
+
+function applyTheme(theme) {
+  html.dataset.theme = theme;
+  localStorage.setItem('theme', theme);
+  /* Switch icon: moon for dark mode, sun for light mode */
+  themeIcon.className = theme === 'dark' ? 'fa-solid fa-moon' : 'fa-solid fa-sun';
+}
+
+/* Load saved theme preference */
+const savedTheme = localStorage.getItem('theme') || 'dark';
+applyTheme(savedTheme);
+
+themeToggle.addEventListener('click', () => {
+  const newTheme = html.dataset.theme === 'dark' ? 'light' : 'dark';
+  applyTheme(newTheme);
+});
+
+/* ═══════════════════════════════════════════
+   4. CUSTOM CURSOR
+═══════════════════════════════════════════ */
+const dot = document.getElementById('cdot');
+const ring = document.getElementById('cring');
+let mx = 0, my = 0, rx = 0, ry = 0;
+
+document.addEventListener('mousemove', e => {
+  mx = e.clientX; my = e.clientY;
+  dot.style.left = mx + 'px'; dot.style.top = my + 'px';
+});
+
+/* Smooth ring follow using RAF */
+(function loop() {
+  rx += (mx - rx) * .12; ry += (my - ry) * .12;
+  ring.style.left = rx + 'px'; ring.style.top = ry + 'px';
+  requestAnimationFrame(loop);
+})();
+
+/* Scale ring on interactive elements */
+document.querySelectorAll('a, button, .proj-card, .cert-row, .stat-box, .soc-btn, .tag').forEach(el => {
+  el.addEventListener('mouseenter', () => {
+    ring.style.transform = 'translate(-50%,-50%) scale(2)';
+    ring.style.borderColor = 'rgba(232,255,71,.7)';
+  });
+  el.addEventListener('mouseleave', () => {
+    ring.style.transform = 'translate(-50%,-50%) scale(1)';
+    ring.style.borderColor = 'rgba(232,255,71,.4)';
+  });
+});
+
+/* ═══════════════════════════════════════════
+   5. NAVBAR — scroll behavior & active links
+═══════════════════════════════════════════ */
+const navbar = document.getElementById('navbar');
+const sections = document.querySelectorAll('section[id]');
+const scrollTopBtn = document.getElementById('scrollTop');
+
+window.addEventListener('scroll', () => {
+  /* Navbar glass effect on scroll */
+  navbar.classList.toggle('scrolled', scrollY > 30);
+
+  /* Scroll-to-top button visibility */
+  scrollTopBtn.classList.toggle('show', scrollY > 400);
+
+  /* Active nav link highlight */
+  let current = '';
+  sections.forEach(sec => {
+    if (scrollY >= sec.offsetTop - 130) current = sec.id;
+  });
+  document.querySelectorAll('.nav-links a').forEach(a => {
+    a.classList.toggle('active', a.getAttribute('href') === '#' + current);
+  });
+});
+
+scrollTopBtn.addEventListener('click', () => window.scrollTo({ top: 0, behavior: 'smooth' }));
+
+/* ═══════════════════════════════════════════
+   6. MOBILE MENU
+═══════════════════════════════════════════ */
+const hamburger = document.getElementById('hamburger');
+const mobMenu = document.getElementById('mob-menu');
+
+hamburger.addEventListener('click', () => {
+  const isOpen = mobMenu.style.display === 'flex';
+  mobMenu.style.display = isOpen ? 'none' : 'flex';
+  hamburger.classList.toggle('open', !isOpen);
+});
+
+mobMenu.querySelectorAll('a').forEach(a => {
+  a.addEventListener('click', () => {
+    mobMenu.style.display = 'none';
+    hamburger.classList.remove('open');
+  });
+});
+
+/* ═══════════════════════════════════════════
+   7. TYPING ANIMATION
+═══════════════════════════════════════════ */
+const words = ['Full Stack Dev', 'React Engineer', 'Laravel Expert', 'SaaS Builder', 'Node.js Dev'];
+let wi = 0, ci = 0, deleting = false;
+const typedEl = document.getElementById('typed');
+
+function tick() {
+  const word = words[wi];
+  typedEl.textContent = deleting ? word.slice(0, ci - 1) : word.slice(0, ci + 1);
+  deleting ? ci-- : ci++;
+
+  if (!deleting && ci === word.length) {
+    setTimeout(() => { deleting = true; tick(); }, 1800);
+    return;
+  }
+  if (deleting && ci === 0) {
+    deleting = false;
+    wi = (wi + 1) % words.length;
+  }
+  setTimeout(tick, deleting ? 55 : 85);
+}
+tick();
+
+/* ═══════════════════════════════════════════
+   8. SCROLL REVEAL (IntersectionObserver)
+═══════════════════════════════════════════ */
+const revealObs = new IntersectionObserver(entries => {
+  entries.forEach(entry => {
+    if (entry.isIntersecting) {
+      entry.target.classList.add('in');
+      revealObs.unobserve(entry.target);
+    }
+  });
+}, { threshold: 0.1 });
+
+document.querySelectorAll('.reveal, .reveal-x, .stagger').forEach(el => revealObs.observe(el));
+
+/* ═══════════════════════════════════════════
+   9. SKILL BARS (animate on scroll)
+═══════════════════════════════════════════ */
+const barObs = new IntersectionObserver(entries => {
+  entries.forEach(entry => {
+    if (entry.isIntersecting) {
+      entry.target.querySelectorAll('.bar-fg').forEach(bar => {
+        bar.style.width = bar.dataset.w + '%';
+      });
+      barObs.unobserve(entry.target);
+    }
+  });
+}, { threshold: 0.2 });
+
+document.querySelectorAll('.skills-grid').forEach(el => barObs.observe(el));
+
+/* ═══════════════════════════════════════════
+   10. CERTIFICATE MODAL
+═══════════════════════════════════════════ */
+const certOverlay = document.getElementById('certModalOverlay');
+const certModal = document.getElementById('certModal');
+const certModalTitle = document.getElementById('certModalTitle');
+const certModalIssuer = document.getElementById('certModalIssuer');
+const certModalBody = document.getElementById('certModalBody');
+const certModalDownload = document.getElementById('certModalDownload');
+
+function openCertModal(row) {
+  const name = row.dataset.certName;
+  const issuer = row.dataset.certIssuer;
+  const url = row.dataset.certUrl;
+
+  certModalTitle.textContent = name;
+  certModalIssuer.textContent = issuer;
+
+  /* Set download link */
+  certModalDownload.href = url !== '#' ? url : '#';
+
+  /* Render certificate preview */
+  certModalBody.innerHTML = '';
+  if (url && url !== '#') {
+    /* If the URL is an image */
+    if (/\.(jpg|jpeg|png|gif|webp)$/i.test(url)) {
+      const img = document.createElement('img');
+      img.src = url;
+      img.style.cssText = 'max-width:100%;border:1px solid var(--border);border-radius:2px;';
+      img.alt = name;
+      certModalBody.appendChild(img);
+    }
+    /* If the URL is a PDF */
+    else if (/\.pdf$/i.test(url)) {
+      const iframe = document.createElement('iframe');
+      iframe.src = url;
+      iframe.style.cssText = 'width:100%;height:500px;border:none;';
+      certModalBody.appendChild(iframe);
+    }
+    /* External link fallback */
+    else {
+      certModalBody.innerHTML = `
+        <div class="cert-placeholder">
+          <i class="fa-solid fa-award" style="font-size:3rem;color:var(--em)"></i>
+          <p style="color:var(--text);font-size:15px;font-weight:600">${name}</p>
+          <p style="color:var(--muted2)">${issuer}</p>
+          <a href="${url}" target="_blank" class="btn-a" style="margin-top:1rem;font-size:11px;padding:10px 20px">
+            <i class="fa-solid fa-external-link"></i> Open Certificate
+          </a>
+        </div>`;
+    }
+  } else {
+    /* Placeholder when no URL is set */
+    certModalBody.innerHTML = `
+      <div class="cert-placeholder">
+        <i class="fa-solid fa-award" style="font-size:3.5rem;color:var(--em)"></i>
+        <p style="color:var(--text);font-size:15px;font-weight:700;text-align:center">${name}</p>
+        <p style="color:var(--muted2);font-size:13px">${issuer}</p>
+        <p style="color:var(--muted);font-size:12px;text-align:center;margin-top:0.5rem">
+          Set the <code style="color:var(--em)">data-cert-url</code> attribute on the row<br>to link your certificate image or PDF.
+        </p>
+      </div>`;
+  }
+
+  /* Open modal with animation */
+  certOverlay.classList.add('open');
+  document.body.style.overflow = 'hidden';
+}
+
+function closeCertModal() {
+  certOverlay.classList.remove('open');
+  document.body.style.overflow = '';
+}
+
+/* Close on overlay click */
+certOverlay.addEventListener('click', e => {
+  if (e.target === certOverlay) closeCertModal();
+});
+
+/* Close on Escape key */
+document.addEventListener('keydown', e => {
+  if (e.key === 'Escape') closeCertModal();
+});
+
+/* ═══════════════════════════════════════════
+   11. CONTACT FORM with EmailJS
+   ─────────────────────────────────────────
+   SETUP INSTRUCTIONS:
+   1. Create a free account at emailjs.com
+   2. Create an Email Service (Gmail, etc.)
+   3. Create an Email Template with variables:
+      {{from_name}}, {{from_email}}, {{subject}}, {{message}}
+   4. Replace the placeholders below:
+      - YOUR_PUBLIC_KEY  → Account > API Keys
+      - YOUR_SERVICE_ID  → Email Services > Service ID
+      - YOUR_TEMPLATE_ID → Email Templates > Template ID
+═══════════════════════════════════════════ */
+const EMAILJS_PUBLIC_KEY  = 'YOUR_PUBLIC_KEY';
+const EMAILJS_SERVICE_ID  = 'YOUR_SERVICE_ID';
+const EMAILJS_TEMPLATE_ID = 'YOUR_TEMPLATE_ID';
+
+/* Initialize EmailJS with your public key */
+if (typeof emailjs !== 'undefined') {
+  emailjs.init(EMAILJS_PUBLIC_KEY);
+}
+
+const contactForm = document.getElementById('contactForm');
+const submitBtn = document.getElementById('submitBtn');
+const submitLabel = document.getElementById('submitLabel');
+const submitIcon = document.getElementById('submitIcon');
+const formStatus = document.getElementById('formStatus');
+
+/* Validate a single field — returns true if valid */
+function validateField(inputId, fieldId, condition) {
+  const field = document.getElementById(fieldId);
+  const isValid = condition(document.getElementById(inputId).value.trim());
+  field.classList.toggle('error', !isValid);
+  return isValid;
+}
+
+/* Full form validation */
+function validateForm() {
+  const t = translations[currentLang];
+  let valid = true;
+
+  if (!validateField('inp-name', 'field-name', v => v.length >= 2)) valid = false;
+  if (!validateField('inp-email', 'field-email', v => /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(v))) valid = false;
+  if (!validateField('inp-message', 'field-message', v => v.length >= 10)) valid = false;
+
+  return valid;
+}
+
+/* Clear field errors on input */
+['inp-name', 'inp-email', 'inp-message'].forEach(id => {
+  document.getElementById(id).addEventListener('input', () => {
+    const fieldId = 'field-' + id.replace('inp-', '');
+    document.getElementById(fieldId).classList.remove('error');
+  });
+});
+
+contactForm.addEventListener('submit', async (e) => {
+  e.preventDefault();
+
+  /* Run validation */
+  if (!validateForm()) return;
+
+  const t = translations[currentLang];
+  const name    = document.getElementById('inp-name').value.trim();
+  const email   = document.getElementById('inp-email').value.trim();
+  const subject = document.getElementById('inp-subject').value.trim() || 'Portfolio Contact';
+  const message = document.getElementById('inp-message').value.trim();
+
+  /* Spam protection: check for suspiciously short or spammy content */
+  if (message.split(' ').length < 3) {
+    document.getElementById('field-message').classList.add('error');
+    return;
+  }
+
+  /* UI: loading state */
+  submitBtn.disabled = true;
+  submitLabel.innerHTML = `<span class="spinner"></span> ${t['contact.sending']}`;
+  submitIcon.style.display = 'none';
+  formStatus.className = 'form-status';
+
+  try {
+    if (typeof emailjs !== 'undefined' && EMAILJS_PUBLIC_KEY !== 'YOUR_PUBLIC_KEY') {
+      /* === REAL EMAIL SEND via EmailJS === */
+      await emailjs.send(EMAILJS_SERVICE_ID, EMAILJS_TEMPLATE_ID, {
+        from_name:  name,
+        from_email: email,
+        subject:    subject,
+        message:    message,
+        to_email:   'mohammed.elharcha.pro@gmail.com'
+      });
+    } else {
+      /* === DEMO MODE: simulate a network request === */
+      await new Promise(res => setTimeout(res, 1500));
+      /* In production, EmailJS keys above must be filled in */
+    }
+
+    /* Success state */
+    formStatus.textContent = t['contact.success'];
+    formStatus.className = 'form-status success';
+    contactForm.reset();
+    document.querySelectorAll('.form-field').forEach(f => f.classList.remove('error'));
+
+  } catch (err) {
+    /* Error state */
+    console.error('EmailJS error:', err);
+    formStatus.textContent = t['contact.error'];
+    formStatus.className = 'form-status error';
+  }
+
+  /* Restore button */
+  submitBtn.disabled = false;
+  submitLabel.textContent = t['contact.send'];
+  submitLabel.dataset.i18n = 'contact.send';
+  submitIcon.style.display = '';
+  submitIcon.className = 'fa-solid fa-arrow-up-right';
+});
+
+/* ═══════════════════════════════════════════
+   12. SMOOTH SCROLL for anchor links
+═══════════════════════════════════════════ */
+document.querySelectorAll('a[href^="#"]').forEach(a => {
+  a.addEventListener('click', e => {
+    const target = document.querySelector(a.getAttribute('href'));
+    if (target) {
+      e.preventDefault();
+      target.scrollIntoView({ behavior: 'smooth' });
+    }
+  });
+});
+
+/* ═══════════════════════════════════════════
+   13. INIT — apply saved preferences on load
+═══════════════════════════════════════════ */
+applyTranslations(currentLang);
+</script>
+</body>
+</html>
