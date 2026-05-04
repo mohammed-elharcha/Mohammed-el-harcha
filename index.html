@@ -371,7 +371,7 @@ nav.scrolled {
   display: grid; grid-template-columns: 1fr 1fr;
   gap: 4rem; align-items: start;
 }
-@media (max-width: 768px) { .about-grid { grid-template-columns: 1fr; gap: 2.5rem; } }
+@media (max-width: 480px) { .about-grid { grid-template-columns: 1fr; gap: 2rem; } }
 
 .about-text p { font-size: 15px; line-height: 2; color: var(--muted2); margin-bottom: 1rem; }
 .about-text p strong { color: var(--text); font-weight: 600; }
@@ -382,7 +382,7 @@ nav.scrolled {
   border: 1px solid var(--border); border-radius: 2px; overflow: hidden;
 }
 .detail-row {
-  display: flex; align-items: center; gap: 1rem;
+  display: flex; align-items: center;flex-wrap:wrap; gap: 4px;
   padding: 1rem 1.25rem; border-bottom: 1px solid var(--border);
   transition: background 0.2s;
 }
