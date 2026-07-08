@@ -10,4 +10,4 @@ A modern and responsive portfolio website showcasing my projects, skills, and ex
 
 ---
 
-© 2025 Mohammed El Harcha. All rights reserved.
+© 2026 Mohammed El Harcha. All rights reserved.
